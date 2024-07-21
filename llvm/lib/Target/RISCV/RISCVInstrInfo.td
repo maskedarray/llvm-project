@@ -634,6 +634,10 @@ def LBU : Load_ri<0b100, "lbu">, Sched<[WriteLDB, ReadMemBase]>;
 def LHU : Load_ri<0b101, "lhu">, Sched<[WriteLDH, ReadMemBase]>;
 }
 
+def CNTR_READ : RVInstI<0b000, OPC_CNTRD, (outs GPR:$rd), (ins GPR:$rs1), "cnt.rd", "$rd, $rs1">, Sched<[]>{
+  let imm12 = 0;
+}
+
 def SB : Store_rri<0b000, "sb">, Sched<[WriteSTB, ReadStoreData, ReadMemBase]>;
 def SH : Store_rri<0b001, "sh">, Sched<[WriteSTH, ReadStoreData, ReadMemBase]>;
 def SW : Store_rri<0b010, "sw">, Sched<[WriteSTW, ReadStoreData, ReadMemBase]>;
@@ -1001,6 +1005,8 @@ def : InstAlias<"lbu $rd, (${rs1})",
                 (LBU  GPR:$rd, GPR:$rs1, 0)>;
 def : InstAlias<"lhu $rd, (${rs1})",
                 (LHU  GPR:$rd, GPR:$rs1, 0)>;
+def : InstAlias<"cnt.rd $rd, $rs1",
+                (CNTR_READ  GPR:$rd, GPR:$rs1)>;
 
 def : InstAlias<"sb $rs2, (${rs1})",
                 (SB  GPR:$rs2, GPR:$rs1, 0)>;
@@ -1796,11 +1802,17 @@ class LdPat<PatFrag LoadOp, RVInst Inst, ValueType vt = XLenVT>
     : Pat<(vt (LoadOp (AddrRegImm (XLenVT GPR:$rs1), simm12:$imm12))),
           (Inst GPR:$rs1, simm12:$imm12)>;
 
+class CNTR_READ_PAT<PatFrag LoadOp, RVInst Inst, ValueType vt = XLenVT>
+    : Pat<(vt (LoadOp GPR:$rs1)),
+          (Inst GPR:$rs1)>;
+
+
 def : LdPat<sextloadi8, LB>;
 def : LdPat<extloadi8, LBU>; // Prefer unsigned due to no c.lb in Zcb.
 def : LdPat<sextloadi16, LH>;
 def : LdPat<extloadi16, LH>;
 def : LdPat<load, LW, i32>;
+def : CNTR_READ_PAT<load, CNTR_READ, i32>;
 def : LdPat<zextloadi8, LBU>;
 def : LdPat<zextloadi16, LHU>;
 
