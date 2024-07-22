@@ -638,6 +638,25 @@ def CNTR_READ : RVInstI<0b000, OPC_CNTRD, (outs GPR:$rd), (ins GPR:$rs1), "cnt.r
   let imm12 = 0;
 }
 
+def CNTR_WRITE : RVInstS<0b001, OPC_CNTRD, (outs), (ins GPR:$rs2, GPR:$rs1), "cnt.wr", "$rs2, $rs1">, Sched<[]>{
+  let imm12 = 0;
+}
+
+def CNTR_WFP :  RVInstR<0b0000000, 0b010, OPC_CNTRD, (outs GPR:$rd), (ins GPR:$rs1), "cnt.wfp", "$rd, $rs1">, Sched<[]>{
+  let mayLoad = 1;
+  let mayStore = 0;
+  let hasSideEffects = 1;
+  let rs2 = 0;
+}
+
+def CNTR_WFO :  RVInstR<0b0000001, 0b010, OPC_CNTRD, (outs GPR:$rd), (ins GPR:$rs1), "cnt.wfo", "$rd, $rs1">, Sched<[]>{
+  let mayLoad = 1; 
+  let mayStore = 0;
+  let hasSideEffects = 1;
+  let rs2 = 0;
+}
+
+
 def SB : Store_rri<0b000, "sb">, Sched<[WriteSTB, ReadStoreData, ReadMemBase]>;
 def SH : Store_rri<0b001, "sh">, Sched<[WriteSTH, ReadStoreData, ReadMemBase]>;
 def SW : Store_rri<0b010, "sw">, Sched<[WriteSTW, ReadStoreData, ReadMemBase]>;
@@ -1007,6 +1026,12 @@ def : InstAlias<"lhu $rd, (${rs1})",
                 (LHU  GPR:$rd, GPR:$rs1, 0)>;
 def : InstAlias<"cnt.rd $rd, $rs1",
                 (CNTR_READ  GPR:$rd, GPR:$rs1)>;
+def : InstAlias<"cnt.wr $rs2, $rs1",
+                (CNTR_WRITE  GPR:$rs2, GPR:$rs1)>;
+def : InstAlias<"cnt.wfp $rd, $rs1",
+                (CNTR_WFP  GPR:$rd, GPR:$rs1)>;
+def : InstAlias<"cnt.wfo $rd, $rs1",
+                (CNTR_WFO  GPR:$rd, GPR:$rs1)>;
 
 def : InstAlias<"sb $rs2, (${rs1})",
                 (SB  GPR:$rs2, GPR:$rs1, 0)>;
@@ -1813,6 +1838,8 @@ def : LdPat<sextloadi16, LH>;
 def : LdPat<extloadi16, LH>;
 def : LdPat<load, LW, i32>;
 def : CNTR_READ_PAT<load, CNTR_READ, i32>;
+def : CNTR_READ_PAT<load, CNTR_WFP, i32>;
+def : CNTR_READ_PAT<load, CNTR_WFO, i32>;
 def : LdPat<zextloadi8, LBU>;
 def : LdPat<zextloadi16, LHU>;
 
@@ -1824,10 +1851,15 @@ class StPat<PatFrag StoreOp, RVInst Inst, RegisterClass StTy,
                    simm12:$imm12)),
           (Inst StTy:$rs2, GPR:$rs1, simm12:$imm12)>;
 
+class CNTR_WRITE_PAT<PatFrag StoreOp, RVInst Inst, ValueType vt = XLenVT>
+    : Pat<(StoreOp (vt GPR:$rs2), (vt GPR:$rs1)),
+          (Inst GPR:$rs2, GPR:$rs1)>;
+
 def : StPat<truncstorei8, SB, GPR, XLenVT>;
 def : StPat<truncstorei16, SH, GPR, XLenVT>;
 def : StPat<store, SW, GPR, i32>;
 
+def : CNTR_WRITE_PAT<store, CNTR_WRITE>;
 /// Fences
 
 // Refer to Table A.6 in the version 2.3 draft of the RISC-V Instruction Set
