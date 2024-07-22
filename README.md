@@ -1,3 +1,16 @@
+# LLVM Fork for RISCV APMU Custom Instructions
+
+## Building the compiler
+```bash
+git clone https://github.com/maskedarray/llvm-project
+git checkout rv-apmu-sw
+mkdir build
+cd build
+cmake -DLLVM_ENABLE_PROJECTS="clang;lld" -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=RISCV -G "Unix Makefiles" ../llvm
+```
+
+
+
 # The LLVM Compiler Infrastructure
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/llvm/llvm-project/badge)](https://securityscorecards.dev/viewer/?uri=github.com/llvm/llvm-project)
