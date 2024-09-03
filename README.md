@@ -1,3 +1,7 @@
+# The LLVM Compiler Infrastructure For APMU
+
+This repository contains [LLVM backend patch with custom instructions](https://github.com/maskedarray/llvm-project/tree/rv-apmu-sw/) for RISCV APMU.
+
 # The LLVM Compiler Infrastructure
 
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/llvm/llvm-project/badge)](https://securityscorecards.dev/viewer/?uri=github.com/llvm/llvm-project)
