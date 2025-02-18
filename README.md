@@ -7,6 +7,7 @@ git checkout rv-apmu-sw
 mkdir build
 cd build
 cmake -DLLVM_ENABLE_PROJECTS="clang;lld" -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=RISCV -G "Unix Makefiles" ../llvm
+make
 ```
 
 
