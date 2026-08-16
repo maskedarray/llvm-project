@@ -1,7 +1,10 @@
 # LLVM Fork for RISCV APMU Custom Instructions
 
 ## Building the compiler
+Building LLVM requires several dependencies. Since this fork is from 2022, it builds with gcc-12 and g++-12.
+
 ```bash
+sudo apt install -y gcc-12 g++-12 cmake make python3 git zlib1g-dev
 git clone https://github.com/maskedarray/llvm-project
 git checkout rv-apmu-sw
 mkdir build
